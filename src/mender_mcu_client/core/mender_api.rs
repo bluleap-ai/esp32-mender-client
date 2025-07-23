@@ -45,6 +45,7 @@ pub fn get_deployment_status_path(deployment_id: &str) -> String {
 }
 
 #[derive(Serialize, Deserialize)]
+#[allow(dead_code)]
 struct Payload<'a> {
     id_data: &'a str, // Changed to &str instead of String
     pubkey: &'a str,

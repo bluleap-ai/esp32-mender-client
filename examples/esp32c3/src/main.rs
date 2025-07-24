@@ -107,7 +107,6 @@ fn deployment_status_cb(status: DeploymentStatus, message: Option<&str>) -> Mend
 
 fn restart_cb() -> MenderResult<()> {
     log_info!("restart_cb");
-
     esp_hal::system::software_reset();
 
     Ok((MenderStatus::Ok, ()))
@@ -123,7 +122,10 @@ async fn main(spawner: Spawner) -> ! {
     esp_println::logger::init_logger_from_env();
     let peripherals = esp_hal::init({
         let config = esp_hal::Config::default();
-        let _ = config.with_cpu_clock(CpuClock::max());
+        match config.with_cpu_clock(CpuClock::max()) {
+            Ok(_) => log_info!("CPU clock configured successfully."),
+            Err(e) => log_error!("Failed to configure CPU clock: {:?}", e),
+        }
         config
     });
     esp_alloc::heap_allocator!(size: 120 * 1024);
@@ -154,12 +156,6 @@ async fn main(spawner: Spawner) -> ! {
     //     )
     // );
     // Init network stack
-    // let (stack, runner) = embassy_net::new(
-    //     wifi_interface,
-    //     config,
-    //     mk_static!(StackResources<3>, StackResources::<3>::new()),
-    //     seed,
-    // );
     let (stack, runner) = embassy_net::new(
         wifi_interface.sta,
         config,

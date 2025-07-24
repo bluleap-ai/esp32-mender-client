@@ -122,7 +122,10 @@ async fn main(spawner: Spawner) -> ! {
     esp_println::logger::init_logger_from_env();
     let peripherals = esp_hal::init({
         let config = esp_hal::Config::default();
-        let _ = config.with_cpu_clock(CpuClock::max());
+        match config.with_cpu_clock(CpuClock::max()) {
+            Ok(_) => log_info!("CPU clock configured successfully."),
+            Err(e) => log_error!("Failed to configure CPU clock: {:?}", e),
+        }
         config
     });
     esp_alloc::heap_allocator!(size: 120 * 1024);

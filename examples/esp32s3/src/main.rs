@@ -197,9 +197,7 @@ async fn main(spawner: Spawner) -> ! {
         .spawn(connection(controller))
         .expect("connection spawn");
     spawner.spawn(net_task(runner)).expect("net task spawn");
-    spawner
-        .spawn(work_queue_task())
-        .expect("work queue task spawn");
+    spawner.spawn(work_queue_task()).expect("work queue task spawn");
     spawner.spawn(test_task()).expect("test task spawn");
 
     loop {
@@ -332,10 +330,6 @@ async fn connection(
     //stack: &'static Stack<WifiDevice<'static, WifiStaDevice>>,
 ) {
     log_info!("start connection task");
-    log_info!("turn off power saving mode");
-    controller
-        .set_power_saving(esp_wifi::config::PowerSaveMode::None)
-        .unwrap();
     loop {
         if esp_wifi::wifi::wifi_state() == WifiState::StaConnected {
             // wait until we're no longer connected

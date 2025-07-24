@@ -41,6 +41,9 @@ spin = { version = "0.9.8", default-features = false, features = [
 
 esp32-mender-client = { path = "../..", features = ["esp32c3"] }
 
+[patch.crates-io]
+delog = { version = "0.1.6", git = "https://github.com/LechevSpace/delog.git", rev = "e83f3fd" }
+
 [profile.dev]
 # Rust debug is too slow.
 # For debug builds always builds with some optimization

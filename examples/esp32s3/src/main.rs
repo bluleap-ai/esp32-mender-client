@@ -18,6 +18,7 @@ use esp_println::println;
 use esp_storage::FlashStorage;
 use esp_wifi::{
     init,
+    EspWifiController,
     wifi::{
         ClientConfiguration,
         Configuration,
@@ -27,8 +28,6 @@ use esp_wifi::{
         WifiState,
     },
 };
-use esp_wifi::EspWifiController;
-
 use esp32_mender_client::external::esp_hal_ota::Ota;
 use esp32_mender_client::mender_mcu_client::add_ons::inventory::mender_inventory::{
     MenderInventoryConfig, MENDER_INVENTORY_ADDON_INSTANCE,

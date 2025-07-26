@@ -18,13 +18,16 @@ use esp_println::println;
 use esp_storage::FlashStorage;
 use esp_wifi::{
     init,
+    EspWifiController,
     wifi::{
-        ClientConfiguration, Configuration, WifiController, WifiDevice, WifiEvent, WifiStaDevice,
+        ClientConfiguration,
+        Configuration,
+        WifiController,
+        WifiDevice,
+        WifiEvent,
         WifiState,
     },
-    EspWifiController,
 };
-
 use esp32_mender_client::external::esp_hal_ota::Ota;
 use esp32_mender_client::mender_mcu_client::add_ons::inventory::mender_inventory::{
     MenderInventoryConfig, MENDER_INVENTORY_ADDON_INSTANCE,
@@ -105,8 +108,7 @@ fn deployment_status_cb(status: DeploymentStatus, message: Option<&str>) -> Mend
 
 fn restart_cb() -> MenderResult<()> {
     log_info!("restart_cb");
-
-    esp_hal::reset::software_reset();
+    esp_hal::system::software_reset();
 
     Ok((MenderStatus::Ok, ()))
 }
@@ -121,10 +123,10 @@ async fn main(spawner: Spawner) -> ! {
     esp_println::logger::init_logger_from_env();
     let peripherals = esp_hal::init({
         let mut config = esp_hal::Config::default();
-        config.cpu_clock = CpuClock::max();
+        config.with_cpu_clock(CpuClock::max());
         config
     });
-    esp_alloc::heap_allocator!(120 * 1024);
+    esp_alloc::heap_allocator!(size: 120 * 1024);
     let timg0 = TimerGroup::new(peripherals.TIMG0);
     let timg1 = TimerGroup::new(peripherals.TIMG1);
     esp_hal_embassy::init(timg1.timer0);
@@ -165,8 +167,7 @@ async fn main(spawner: Spawner) -> ! {
     );
 
     let wifi = peripherals.WIFI;
-    let (wifi_interface, controller) =
-        esp_wifi::wifi::new_with_mode(init, wifi, WifiStaDevice).unwrap();
+    let (controller, wifi_interface) = esp_wifi::wifi::new(init, wifi).unwrap();
     let config = embassy_net::Config::dhcpv4(Default::default());
 
     let seed = (trng.rng.random() as u64) << 32 | trng.rng.random() as u64;
@@ -187,11 +188,12 @@ async fn main(spawner: Spawner) -> ! {
     // );
     // Init network stack
     let (stack, runner) = embassy_net::new(
-        wifi_interface,
+        wifi_interface.sta,
         config,
         mk_static!(StackResources<3>, StackResources::<3>::new()),
         seed,
     );
+
 
     let mut ota = match Ota::new(FlashStorage::new()) {
         Ok(ota) => ota,
@@ -401,7 +403,7 @@ async fn connection(
 }
 
 #[embassy_executor::task]
-async fn net_task(mut runner: Runner<'static, WifiDevice<'static, WifiStaDevice>>) {
+async fn net_task(mut runner: Runner<'static, WifiDevice<'static>>) {
     runner.run().await
 }
 

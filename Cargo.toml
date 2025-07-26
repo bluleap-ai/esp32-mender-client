@@ -8,10 +8,11 @@ description = "Mender client library for esp32"
 repository = "https://github.com/virust-ai/esp32-mender-client"
 
 [dependencies]
-embassy-executor    = "0.7.0"
-embassy-net = { version = "0.6.0", features = ["dhcpv4", "dns", "tcp", "udp"] }
-embassy-time        = "0.4.0"
-embassy-sync        = "0.6.1"
+esp-hal = { version = "=1.0.0-beta.1", features = ["unstable"], optional = true }  # Make esp-hal optional
+embassy-executor = "0.7.0"
+embassy-net = { version = "0.7.0", features = [ "tcp", "udp", "dhcpv4", "dns"] }
+embassy-time = "0.4.0"
+embassy-sync = "0.6.1"
 log = { version = "0.4.22" }
 heapless = { version = "0.8.0", default-features = false }
 embedded-io-async = "0.6.1"
@@ -24,10 +25,10 @@ embedded-storage = "0.3.1"
 serde = { version = "1.0.217", default-features = false, features = ["derive"] }
 embedded-websocket = { version = "0.9.4", default-features = false }
 littlefs2 = { version = "0.6.0", default-features = false, features = ["c-stubs"]}
-esp-hal = { version = "0.23.1", optional = true }
-esp-storage = { version = "0.4.0", optional = true }
 
-spin = { version = "0.9.8", default-features = false, features = ["once", "portable_atomic"], optional = true}
+esp-storage = { version = "0.6.0", optional = true }
+
+spin = { version = "0.9.8", default-features = false, features = ["once", "portable_atomic"], optional = true }
 
 delog = { version = "=0.1.6", optional = true }  # Force exactly version 0.1.6
 

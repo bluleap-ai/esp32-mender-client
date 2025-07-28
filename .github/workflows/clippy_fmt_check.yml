@@ -30,7 +30,7 @@ jobs:
           sudo apt-get install -y libudev-dev
           sudo apt install pkg-config
           cargo update
-          cargo install espup
+          cargo install espup --locked
           espup install --targets esp32s3
           export PATH=$(pwd)/aarch64-linux-musl-cross/bin:$PATH
         shell: bash
